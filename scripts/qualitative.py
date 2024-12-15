@@ -1,6 +1,7 @@
 from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
+from textblob import TextBlob
 
 
 def headline_length(data):
@@ -30,3 +31,11 @@ def articles_per_publisher(data):
     publisher_count = data.groupby('publisher')['headline'].count().reset_index()
     publisher_count = publisher_count.rename(columns={'headline': 'article_count'})
     return publisher_count.sort_values(by='article_count', ascending=False)
+
+
+
+def sentiment(data):
+
+    data['sentiment'] = data['headline'].apply(lambda x: TextBlob(x).sentiment.polarity)
+    data['sentiment_category'] = data['sentiment'].apply(lambda x: 'positive' if x > 0 else 'negative' if x < 0 else 'neutral')
+    return data[['headline','sentiment','sentiment_category']]
