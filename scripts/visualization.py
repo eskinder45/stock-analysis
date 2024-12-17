@@ -3,11 +3,10 @@ import pandas as pd
 import seaborn as sns
 from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-import pickle
 import os
 import re
 from scripts.qualitative import sentiment
+from models.models import predict
 
 
 # a function that returns a number of articles published by top n publishers
@@ -39,15 +38,7 @@ def word_cloud(df:pd.DataFrame):
 
 # topics category published by to n publishers
 def topic_per_publisher(df:pd.DataFrame,top:int):
-    # Preprocess headlines
-    vectorizer = CountVectorizer(stop_words='english', max_df=0.9, min_df=2)
-    dtm = vectorizer.fit_transform(df['headline'].dropna().astype(str))
-    # Load the LDA model from the file
-    with open(os.path.dirname(os.getcwd()) + "\\models\\lda_model.pkl", 'rb') as file:
-        lda = pickle.load(file)
-    # finding the dominant topic for each article
-    df['topic'] = lda.transform(dtm).argmax(axis=1)
-
+    df = predict(df)
     for count, i in enumerate(list(dict(df['publisher'].value_counts()[:top]).keys())):
         if count == 0:
             new_df  = df[df['publisher'] == i]
@@ -69,16 +60,7 @@ def topic_per_publisher(df:pd.DataFrame,top:int):
 
 #number of articles per topic
 def articles_per_topic(df:pd.DataFrame):
-
-    # Preprocess headlines
-    vectorizer = CountVectorizer(stop_words='english', max_df=0.9, min_df=2)
-    dtm = vectorizer.fit_transform(df['headline'].dropna().astype(str))
-    # Load the LDA model from the file
-    with open(os.path.dirname(os.getcwd()) + "\\models\\lda_model.pkl", 'rb') as file:
-        lda = pickle.load(file)
-    # finding the dominant topic for each article
-    df['topic'] = lda.transform(dtm).argmax(axis=1)
-
+    df = predict(df)
     # Count the number of articles per topic
     topic_counts = df['topic'].value_counts().sort_index()
 
