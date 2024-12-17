@@ -6,6 +6,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 import pickle
 import os
+import re
+from scripts.qualitative import sentiment
 
 
 # a function that returns a number of articles published by top n publishers
@@ -87,5 +89,42 @@ def articles_per_topic(df:pd.DataFrame):
     plt.xlabel('Topic', fontsize=12)
     plt.ylabel('Number of Articles', fontsize=12)
     plt.xticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
+
+
+def articles_by_email_domian(df:pd.DataFrame):
+    df['domain'] = df['publisher'].apply(lambda x: re.search(r'@(\w+\.\w+)', x).group(1) if '@' in x else None)
+    domain_counts = df['domain'].dropna().value_counts()
+    plt.figure(figsize=(10, 6))
+    domain_counts.plot(kind='bar', color='lightgreen', edgecolor='black')
+    plt.title('Email Domain Analysis', fontsize=16)
+    plt.xlabel('Domain', fontsize=12)
+    plt.ylabel('Number of Articles', fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+
+
+#number of articles to each sentiment by top n publishers
+def sentiment_per_publisher(df:pd.DataFrame, top:int):
+    result = sentiment(df)
+    df['sentiment'] = result['sentiment']
+    df['sentiment_category'] = result['sentiment_category']
+    for count, i in enumerate(list(dict(df['publisher'].value_counts()[:top]).keys())):
+        if count == 0:
+            new_df  = df[df['publisher'] == i]
+        else:
+            tmp = df[df['publisher'] == i]
+            df_lst = [new_df,tmp]
+            new_df = pd.concat(df_lst)
+    sentiments_by_publisher = new_df.groupby(['publisher', 'sentiment_category']).size().reset_index(name='count')
+    plt.figure(figsize=(12, 8))
+    sns.barplot(data=sentiments_by_publisher, x='sentiment_category', y='count', hue='publisher', dodge=True)
+    plt.title('Sentiment Analysis Per Publisher', fontsize=16)
+    plt.xlabel('Sentiment', fontsize=12)
+    plt.ylabel('Number of Articles', fontsize=12)
+    plt.legend(title='Publisher', loc='upper right')
     plt.tight_layout()
     plt.show()
