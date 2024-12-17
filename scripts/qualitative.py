@@ -4,6 +4,7 @@ import pandas as pd
 from textblob import TextBlob
 
 
+
 def headline_length(data):
 
     return data['headline'].apply(len)
