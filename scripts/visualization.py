@@ -128,3 +128,52 @@ def sentiment_per_publisher(df:pd.DataFrame, top:int):
     plt.legend(title='Publisher', loc='upper right')
     plt.tight_layout()
     plt.show()
+
+
+def article_per_day_of_week(df:pd.DataFrame):
+    df['day_of_week'] = df['date'].dt.day_name()
+    day_counts = df['day_of_week'].value_counts()
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=day_counts.index, y=day_counts.values, palette='viridis')
+    plt.title('Articles Published Per Day of the Week', fontsize=16)
+    plt.xlabel('Day of the Week', fontsize=12)
+    plt.ylabel('Number of Articles', fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+
+
+def article_per_hour(df:pd.DataFrame):
+    df['hour'] = df['date'].dt.hour
+    hour_counts = df['hour'].value_counts().sort_index()
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(x=hour_counts.index, y=hour_counts.values, marker='o', color='blue')
+    plt.title('Articles Published Per Hour', fontsize=16)
+    plt.xlabel('Hour of the Day', fontsize=12)
+    plt.ylabel('Number of Articles', fontsize=12)
+    plt.xticks(range(0, 24))
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
+
+
+def articles_per_month(df:pd.DataFrame):
+    df['month'] = df['date'].dt.month
+    month_counts = df['month'].value_counts()
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=month_counts.index, y=month_counts.values, palette='coolwarm')
+    plt.title('Articles Published Per Month', fontsize=16)
+    plt.xlabel('Month', fontsize=12)
+    plt.ylabel('Number of Articles', fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+
+
+#Publication Frequency Over Time
+def publication_freq_wrt_t(df:pd.DataFrame):
+    daily_articles = df.groupby(df['date'].dt.date)['headline'].count()
+    daily_articles.plot(kind='line', title='Publication Frequency Over Time')
+    plt.show()
