@@ -7,7 +7,7 @@ import os
 import re
 from scripts.qualitative import sentiment
 from models.models import predict
-
+import mplfinance as mplf
 
 # a function that returns a number of articles published by top n publishers
 def articls_per_publisher(df:pd.DataFrame,top:int):
